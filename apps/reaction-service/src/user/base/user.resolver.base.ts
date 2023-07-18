@@ -26,6 +26,7 @@ import { UserCountArgs } from "./UserCountArgs";
 import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
 import { User } from "./User";
+import { Post } from "../../post/base/Post";
 import { UserService } from "../user.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => User)
@@ -86,7 +87,15 @@ export class UserResolverBase {
   async createUser(@graphql.Args() args: CreateUserArgs): Promise<User> {
     return await this.service.create({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        posts: args.data.posts
+          ? {
+              connect: args.data.posts,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -101,7 +110,15 @@ export class UserResolverBase {
     try {
       return await this.service.update({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          posts: args.data.posts
+            ? {
+                connect: args.data.posts,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -130,5 +147,26 @@ export class UserResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => Post, {
+    nullable: true,
+    name: "posts",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "Post",
+    action: "read",
+    possession: "any",
+  })
+  async resolveFieldPosts(
+    @graphql.Parent() parent: User
+  ): Promise<Post | null> {
+    const result = await this.service.getPosts(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return result;
   }
 }
