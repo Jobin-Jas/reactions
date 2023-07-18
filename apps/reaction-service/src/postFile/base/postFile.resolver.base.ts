@@ -19,32 +19,31 @@ import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { CreatePostArgs } from "./CreatePostArgs";
-import { UpdatePostArgs } from "./UpdatePostArgs";
-import { DeletePostArgs } from "./DeletePostArgs";
-import { PostCountArgs } from "./PostCountArgs";
-import { PostFindManyArgs } from "./PostFindManyArgs";
-import { PostFindUniqueArgs } from "./PostFindUniqueArgs";
-import { Post } from "./Post";
-import { PostFile } from "../../postFile/base/PostFile";
-import { User } from "../../user/base/User";
-import { PostService } from "../post.service";
+import { CreatePostFileArgs } from "./CreatePostFileArgs";
+import { UpdatePostFileArgs } from "./UpdatePostFileArgs";
+import { DeletePostFileArgs } from "./DeletePostFileArgs";
+import { PostFileCountArgs } from "./PostFileCountArgs";
+import { PostFileFindManyArgs } from "./PostFileFindManyArgs";
+import { PostFileFindUniqueArgs } from "./PostFileFindUniqueArgs";
+import { PostFile } from "./PostFile";
+import { Post } from "../../post/base/Post";
+import { PostFileService } from "../postFile.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
-@graphql.Resolver(() => Post)
-export class PostResolverBase {
+@graphql.Resolver(() => PostFile)
+export class PostFileResolverBase {
   constructor(
-    protected readonly service: PostService,
+    protected readonly service: PostFileService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
 
   @graphql.Query(() => MetaQueryPayload)
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "read",
     possession: "any",
   })
-  async _postsMeta(
-    @graphql.Args() args: PostCountArgs
+  async _postFilesMeta(
+    @graphql.Args() args: PostFileCountArgs
   ): Promise<MetaQueryPayload> {
     const result = await this.service.count(args);
     return {
@@ -53,24 +52,28 @@ export class PostResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => [Post])
+  @graphql.Query(() => [PostFile])
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "read",
     possession: "any",
   })
-  async posts(@graphql.Args() args: PostFindManyArgs): Promise<Post[]> {
+  async postFiles(
+    @graphql.Args() args: PostFileFindManyArgs
+  ): Promise<PostFile[]> {
     return this.service.findMany(args);
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.Query(() => Post, { nullable: true })
+  @graphql.Query(() => PostFile, { nullable: true })
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "read",
     possession: "own",
   })
-  async post(@graphql.Args() args: PostFindUniqueArgs): Promise<Post | null> {
+  async postFile(
+    @graphql.Args() args: PostFileFindUniqueArgs
+  ): Promise<PostFile | null> {
     const result = await this.service.findOne(args);
     if (result === null) {
       return null;
@@ -79,53 +82,45 @@ export class PostResolverBase {
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => Post)
+  @graphql.Mutation(() => PostFile)
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "create",
     possession: "any",
   })
-  async createPost(@graphql.Args() args: CreatePostArgs): Promise<Post> {
+  async createPostFile(
+    @graphql.Args() args: CreatePostFileArgs
+  ): Promise<PostFile> {
     return await this.service.create({
       ...args,
       data: {
         ...args.data,
 
-        postFiles: args.data.postFiles
-          ? {
-              connect: args.data.postFiles,
-            }
-          : undefined,
-
-        userId: {
-          connect: args.data.userId,
+        postId: {
+          connect: args.data.postId,
         },
       },
     });
   }
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
-  @graphql.Mutation(() => Post)
+  @graphql.Mutation(() => PostFile)
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "update",
     possession: "any",
   })
-  async updatePost(@graphql.Args() args: UpdatePostArgs): Promise<Post | null> {
+  async updatePostFile(
+    @graphql.Args() args: UpdatePostFileArgs
+  ): Promise<PostFile | null> {
     try {
       return await this.service.update({
         ...args,
         data: {
           ...args.data,
 
-          postFiles: args.data.postFiles
-            ? {
-                connect: args.data.postFiles,
-              }
-            : undefined,
-
-          userId: {
-            connect: args.data.userId,
+          postId: {
+            connect: args.data.postId,
           },
         },
       });
@@ -139,13 +134,15 @@ export class PostResolverBase {
     }
   }
 
-  @graphql.Mutation(() => Post)
+  @graphql.Mutation(() => PostFile)
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "delete",
     possession: "any",
   })
-  async deletePost(@graphql.Args() args: DeletePostArgs): Promise<Post | null> {
+  async deletePostFile(
+    @graphql.Args() args: DeletePostFileArgs
+  ): Promise<PostFile | null> {
     try {
       return await this.service.delete(args);
     } catch (error) {
@@ -159,40 +156,19 @@ export class PostResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => PostFile, {
+  @graphql.ResolveField(() => Post, {
     nullable: true,
-    name: "postFiles",
+    name: "postId",
   })
   @nestAccessControl.UseRoles({
-    resource: "PostFile",
+    resource: "Post",
     action: "read",
     possession: "any",
   })
-  async resolveFieldPostFiles(
-    @graphql.Parent() parent: Post
-  ): Promise<PostFile | null> {
-    const result = await this.service.getPostFiles(parent.id);
-
-    if (!result) {
-      return null;
-    }
-    return result;
-  }
-
-  @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => User, {
-    nullable: true,
-    name: "userId",
-  })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "read",
-    possession: "any",
-  })
-  async resolveFieldUserId(
-    @graphql.Parent() parent: Post
-  ): Promise<User | null> {
-    const result = await this.service.getUserId(parent.id);
+  async resolveFieldPostId(
+    @graphql.Parent() parent: PostFile
+  ): Promise<Post | null> {
+    const result = await this.service.getPostId(parent.id);
 
     if (!result) {
       return null;

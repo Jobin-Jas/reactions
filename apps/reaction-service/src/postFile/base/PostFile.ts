@@ -11,13 +11,12 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional, ValidateNested } from "class-validator";
+import { IsDate, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
-import { PostFile } from "../../postFile/base/PostFile";
-import { User } from "../../user/base/User";
+import { Post } from "../../post/base/Post";
 
 @ObjectType()
-class Post {
+class PostFile {
   @ApiProperty({
     required: true,
   })
@@ -25,17 +24,6 @@ class Post {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
-
-  @ApiProperty({
-    required: false,
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  @Field(() => String, {
-    nullable: true,
-  })
-  description!: string | null;
 
   @ApiProperty({
     required: true,
@@ -46,21 +34,12 @@ class Post {
   id!: string;
 
   @ApiProperty({
-    required: false,
-    type: () => PostFile,
+    required: true,
+    type: () => Post,
   })
   @ValidateNested()
-  @Type(() => PostFile)
-  @IsOptional()
-  postFiles?: PostFile | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  title!: string;
+  @Type(() => Post)
+  postId?: Post;
 
   @ApiProperty({
     required: true,
@@ -69,14 +48,6 @@ class Post {
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
-
-  @ApiProperty({
-    required: true,
-    type: () => User,
-  })
-  @ValidateNested()
-  @Type(() => User)
-  userId?: User;
 }
 
-export { Post as Post };
+export { PostFile as PostFile };

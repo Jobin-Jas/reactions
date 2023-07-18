@@ -18,7 +18,7 @@ import { SortOrder } from "../../util/SortOrder";
   isAbstract: true,
   description: undefined,
 })
-class PostOrderByInput {
+class PostFileOrderByInput {
   @ApiProperty({
     required: false,
     enum: ["asc", "desc"],
@@ -29,17 +29,6 @@ class PostOrderByInput {
     nullable: true,
   })
   createdAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  description?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -61,18 +50,7 @@ class PostOrderByInput {
   @Field(() => SortOrder, {
     nullable: true,
   })
-  postFilesId?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  title?: SortOrder;
+  postFilesFk?: SortOrder;
 
   @ApiProperty({
     required: false,
@@ -84,17 +62,6 @@ class PostOrderByInput {
     nullable: true,
   })
   updatedAt?: SortOrder;
-
-  @ApiProperty({
-    required: false,
-    enum: ["asc", "desc"],
-  })
-  @IsOptional()
-  @IsEnum(SortOrder)
-  @Field(() => SortOrder, {
-    nullable: true,
-  })
-  userPostFk?: SortOrder;
 }
 
-export { PostOrderByInput as PostOrderByInput };
+export { PostFileOrderByInput as PostFileOrderByInput };

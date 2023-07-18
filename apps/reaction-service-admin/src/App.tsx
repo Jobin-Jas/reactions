@@ -17,6 +17,10 @@ import { PostList } from "./post/PostList";
 import { PostCreate } from "./post/PostCreate";
 import { PostEdit } from "./post/PostEdit";
 import { PostShow } from "./post/PostShow";
+import { PostFileList } from "./postFile/PostFileList";
+import { PostFileCreate } from "./postFile/PostFileCreate";
+import { PostFileEdit } from "./postFile/PostFileEdit";
+import { PostFileShow } from "./postFile/PostFileShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -63,6 +67,13 @@ const App = (): React.ReactElement => {
           edit={PostEdit}
           create={PostCreate}
           show={PostShow}
+        />
+        <Resource
+          name="PostFile"
+          list={PostFileList}
+          edit={PostFileEdit}
+          create={PostFileCreate}
+          show={PostFileShow}
         />
       </Admin>
     </div>
