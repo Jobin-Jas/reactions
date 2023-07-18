@@ -27,11 +27,20 @@ model ReactionType {
 }
 
 model Post {
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   description String?
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
+  postFiles   PostFile?
   title       String
+  updatedAt   DateTime  @updatedAt
+  userId      User      @relation(fields: [userPostFk], references: [id])
+  userPostFk  String    @unique
+}
+
+model PostFile {
+  createdAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  postId      Post     @relation(fields: [postFilesFk], references: [id])
+  postFilesFk String   @unique
   updatedAt   DateTime @updatedAt
-  userId      User     @relation(fields: [userPostFk], references: [id])
-  userPostFk  String   @unique
 }

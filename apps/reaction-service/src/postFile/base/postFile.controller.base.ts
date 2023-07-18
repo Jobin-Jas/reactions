@@ -18,117 +18,96 @@ import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
-import { PostService } from "../post.service";
+import { PostFileService } from "../postFile.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { PostCreateInput } from "./PostCreateInput";
-import { PostWhereInput } from "./PostWhereInput";
-import { PostWhereUniqueInput } from "./PostWhereUniqueInput";
-import { PostFindManyArgs } from "./PostFindManyArgs";
-import { PostUpdateInput } from "./PostUpdateInput";
-import { Post } from "./Post";
+import { PostFileCreateInput } from "./PostFileCreateInput";
+import { PostFileWhereInput } from "./PostFileWhereInput";
+import { PostFileWhereUniqueInput } from "./PostFileWhereUniqueInput";
+import { PostFileFindManyArgs } from "./PostFileFindManyArgs";
+import { PostFileUpdateInput } from "./PostFileUpdateInput";
+import { PostFile } from "./PostFile";
+import { Post } from "../../post/base/Post";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class PostControllerBase {
+export class PostFileControllerBase {
   constructor(
-    protected readonly service: PostService,
+    protected readonly service: PostFileService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
-  @swagger.ApiCreatedResponse({ type: Post })
+  @swagger.ApiCreatedResponse({ type: PostFile })
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "create",
     possession: "any",
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  async create(@common.Body() data: PostCreateInput): Promise<Post> {
+  async create(@common.Body() data: PostFileCreateInput): Promise<PostFile> {
     return await this.service.create({
       data: {
         ...data,
 
-        postFiles: data.postFiles
-          ? {
-              connect: data.postFiles,
-            }
-          : undefined,
-
-        userId: {
-          connect: data.userId,
+        postId: {
+          connect: data.postId,
         },
       },
       select: {
         createdAt: true,
-        description: true,
         id: true,
 
-        postFiles: {
+        postId: {
           select: {
             id: true,
           },
         },
 
-        title: true,
         updatedAt: true,
-
-        userId: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
-  @swagger.ApiOkResponse({ type: [Post] })
-  @ApiNestedQuery(PostFindManyArgs)
+  @swagger.ApiOkResponse({ type: [PostFile] })
+  @ApiNestedQuery(PostFileFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "read",
     possession: "any",
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  async findMany(@common.Req() request: Request): Promise<Post[]> {
-    const args = plainToClass(PostFindManyArgs, request.query);
+  async findMany(@common.Req() request: Request): Promise<PostFile[]> {
+    const args = plainToClass(PostFileFindManyArgs, request.query);
     return this.service.findMany({
       ...args,
       select: {
         createdAt: true,
-        description: true,
         id: true,
 
-        postFiles: {
+        postId: {
           select: {
             id: true,
           },
         },
 
-        title: true,
         updatedAt: true,
-
-        userId: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
-  @swagger.ApiOkResponse({ type: Post })
+  @swagger.ApiOkResponse({ type: PostFile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "read",
     possession: "own",
   })
@@ -136,29 +115,21 @@ export class PostControllerBase {
     type: errors.ForbiddenException,
   })
   async findOne(
-    @common.Param() params: PostWhereUniqueInput
-  ): Promise<Post | null> {
+    @common.Param() params: PostFileWhereUniqueInput
+  ): Promise<PostFile | null> {
     const result = await this.service.findOne({
       where: params,
       select: {
         createdAt: true,
-        description: true,
         id: true,
 
-        postFiles: {
+        postId: {
           select: {
             id: true,
           },
         },
 
-        title: true,
         updatedAt: true,
-
-        userId: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (result === null) {
@@ -171,10 +142,10 @@ export class PostControllerBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
-  @swagger.ApiOkResponse({ type: Post })
+  @swagger.ApiOkResponse({ type: PostFile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "update",
     possession: "any",
   })
@@ -182,44 +153,30 @@ export class PostControllerBase {
     type: errors.ForbiddenException,
   })
   async update(
-    @common.Param() params: PostWhereUniqueInput,
-    @common.Body() data: PostUpdateInput
-  ): Promise<Post | null> {
+    @common.Param() params: PostFileWhereUniqueInput,
+    @common.Body() data: PostFileUpdateInput
+  ): Promise<PostFile | null> {
     try {
       return await this.service.update({
         where: params,
         data: {
           ...data,
 
-          postFiles: data.postFiles
-            ? {
-                connect: data.postFiles,
-              }
-            : undefined,
-
-          userId: {
-            connect: data.userId,
+          postId: {
+            connect: data.postId,
           },
         },
         select: {
           createdAt: true,
-          description: true,
           id: true,
 
-          postFiles: {
+          postId: {
             select: {
               id: true,
             },
           },
 
-          title: true,
           updatedAt: true,
-
-          userId: {
-            select: {
-              id: true,
-            },
-          },
         },
       });
     } catch (error) {
@@ -233,10 +190,10 @@ export class PostControllerBase {
   }
 
   @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: Post })
+  @swagger.ApiOkResponse({ type: PostFile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "Post",
+    resource: "PostFile",
     action: "delete",
     possession: "any",
   })
@@ -244,30 +201,22 @@ export class PostControllerBase {
     type: errors.ForbiddenException,
   })
   async delete(
-    @common.Param() params: PostWhereUniqueInput
-  ): Promise<Post | null> {
+    @common.Param() params: PostFileWhereUniqueInput
+  ): Promise<PostFile | null> {
     try {
       return await this.service.delete({
         where: params,
         select: {
           createdAt: true,
-          description: true,
           id: true,
 
-          postFiles: {
+          postId: {
             select: {
               id: true,
             },
           },
 
-          title: true,
           updatedAt: true,
-
-          userId: {
-            select: {
-              id: true,
-            },
-          },
         },
       });
     } catch (error) {

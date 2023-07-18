@@ -8,6 +8,7 @@ import {
   ReferenceField,
 } from "react-admin";
 import Pagination from "../Components/Pagination";
+import { POSTFILE_TITLE_FIELD } from "../postFile/PostFileTitle";
 import { USER_TITLE_FIELD } from "../user/UserTitle";
 
 export const PostList = (props: ListProps): React.ReactElement => {
@@ -23,6 +24,13 @@ export const PostList = (props: ListProps): React.ReactElement => {
         <DateField source="createdAt" label="Created At" />
         <TextField label="description" source="description" />
         <TextField label="ID" source="id" />
+        <ReferenceField
+          label="post_files"
+          source="postfile.id"
+          reference="PostFile"
+        >
+          <TextField source={POSTFILE_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="title" source="title" />
         <DateField source="updatedAt" label="Updated At" />
         <ReferenceField label="userId" source="user.id" reference="User">

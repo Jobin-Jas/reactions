@@ -7,6 +7,7 @@ import {
   ReferenceInput,
   SelectInput,
 } from "react-admin";
+import { PostFileTitle } from "../postFile/PostFileTitle";
 import { UserTitle } from "../user/UserTitle";
 
 export const PostCreate = (props: CreateProps): React.ReactElement => {
@@ -14,6 +15,13 @@ export const PostCreate = (props: CreateProps): React.ReactElement => {
     <Create {...props}>
       <SimpleForm>
         <TextInput label="description" multiline source="description" />
+        <ReferenceInput
+          source="postFiles.id"
+          reference="PostFile"
+          label="post_files"
+        >
+          <SelectInput optionText={PostFileTitle} />
+        </ReferenceInput>
         <TextInput label="title" source="title" />
         <ReferenceInput source="userId.id" reference="User" label="userId">
           <SelectInput optionText={UserTitle} />
