@@ -18,80 +18,97 @@ import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
 import * as nestAccessControl from "nest-access-control";
 import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
-import { ReactionTypeService } from "../reactionType.service";
+import { PostService } from "../post.service";
 import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { ReactionTypeCreateInput } from "./ReactionTypeCreateInput";
-import { ReactionTypeWhereInput } from "./ReactionTypeWhereInput";
-import { ReactionTypeWhereUniqueInput } from "./ReactionTypeWhereUniqueInput";
-import { ReactionTypeFindManyArgs } from "./ReactionTypeFindManyArgs";
-import { ReactionTypeUpdateInput } from "./ReactionTypeUpdateInput";
-import { ReactionType } from "./ReactionType";
-import { Post } from "../../post/base/Post";
+import { PostCreateInput } from "./PostCreateInput";
+import { PostWhereInput } from "./PostWhereInput";
+import { PostWhereUniqueInput } from "./PostWhereUniqueInput";
+import { PostFindManyArgs } from "./PostFindManyArgs";
+import { PostUpdateInput } from "./PostUpdateInput";
+import { Post } from "./Post";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
-export class ReactionTypeControllerBase {
+export class PostControllerBase {
   constructor(
-    protected readonly service: ReactionTypeService,
+    protected readonly service: PostService,
     protected readonly rolesBuilder: nestAccessControl.RolesBuilder
   ) {}
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
-  @swagger.ApiCreatedResponse({ type: ReactionType })
+  @swagger.ApiCreatedResponse({ type: Post })
   @nestAccessControl.UseRoles({
-    resource: "ReactionType",
+    resource: "Post",
     action: "create",
     possession: "any",
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  async create(
-    @common.Body() data: ReactionTypeCreateInput
-  ): Promise<ReactionType> {
+  async create(@common.Body() data: PostCreateInput): Promise<Post> {
     return await this.service.create({
-      data: data,
+      data: {
+        ...data,
+
+        userId: {
+          connect: data.userId,
+        },
+      },
       select: {
         createdAt: true,
+        description: true,
         id: true,
-        typeName: true,
+        title: true,
         updatedAt: true,
+
+        userId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
-  @swagger.ApiOkResponse({ type: [ReactionType] })
-  @ApiNestedQuery(ReactionTypeFindManyArgs)
+  @swagger.ApiOkResponse({ type: [Post] })
+  @ApiNestedQuery(PostFindManyArgs)
   @nestAccessControl.UseRoles({
-    resource: "ReactionType",
+    resource: "Post",
     action: "read",
     possession: "any",
   })
   @swagger.ApiForbiddenResponse({
     type: errors.ForbiddenException,
   })
-  async findMany(@common.Req() request: Request): Promise<ReactionType[]> {
-    const args = plainToClass(ReactionTypeFindManyArgs, request.query);
+  async findMany(@common.Req() request: Request): Promise<Post[]> {
+    const args = plainToClass(PostFindManyArgs, request.query);
     return this.service.findMany({
       ...args,
       select: {
         createdAt: true,
+        description: true,
         id: true,
-        typeName: true,
+        title: true,
         updatedAt: true,
+
+        userId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
-  @swagger.ApiOkResponse({ type: ReactionType })
+  @swagger.ApiOkResponse({ type: Post })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "ReactionType",
+    resource: "Post",
     action: "read",
     possession: "own",
   })
@@ -99,15 +116,22 @@ export class ReactionTypeControllerBase {
     type: errors.ForbiddenException,
   })
   async findOne(
-    @common.Param() params: ReactionTypeWhereUniqueInput
-  ): Promise<ReactionType | null> {
+    @common.Param() params: PostWhereUniqueInput
+  ): Promise<Post | null> {
     const result = await this.service.findOne({
       where: params,
       select: {
         createdAt: true,
+        description: true,
         id: true,
-        typeName: true,
+        title: true,
         updatedAt: true,
+
+        userId: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -120,10 +144,10 @@ export class ReactionTypeControllerBase {
 
   @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
-  @swagger.ApiOkResponse({ type: ReactionType })
+  @swagger.ApiOkResponse({ type: Post })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "ReactionType",
+    resource: "Post",
     action: "update",
     possession: "any",
   })
@@ -131,18 +155,31 @@ export class ReactionTypeControllerBase {
     type: errors.ForbiddenException,
   })
   async update(
-    @common.Param() params: ReactionTypeWhereUniqueInput,
-    @common.Body() data: ReactionTypeUpdateInput
-  ): Promise<ReactionType | null> {
+    @common.Param() params: PostWhereUniqueInput,
+    @common.Body() data: PostUpdateInput
+  ): Promise<Post | null> {
     try {
       return await this.service.update({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          userId: {
+            connect: data.userId,
+          },
+        },
         select: {
           createdAt: true,
+          description: true,
           id: true,
-          typeName: true,
+          title: true,
           updatedAt: true,
+
+          userId: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -156,10 +193,10 @@ export class ReactionTypeControllerBase {
   }
 
   @common.Delete("/:id")
-  @swagger.ApiOkResponse({ type: ReactionType })
+  @swagger.ApiOkResponse({ type: Post })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
   @nestAccessControl.UseRoles({
-    resource: "ReactionType",
+    resource: "Post",
     action: "delete",
     possession: "any",
   })
@@ -167,16 +204,23 @@ export class ReactionTypeControllerBase {
     type: errors.ForbiddenException,
   })
   async delete(
-    @common.Param() params: ReactionTypeWhereUniqueInput
-  ): Promise<ReactionType | null> {
+    @common.Param() params: PostWhereUniqueInput
+  ): Promise<Post | null> {
     try {
       return await this.service.delete({
         where: params,
         select: {
           createdAt: true,
+          description: true,
           id: true,
-          typeName: true,
+          title: true,
           updatedAt: true,
+
+          userId: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {

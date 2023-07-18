@@ -15,10 +15,10 @@ import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
 import { StringFilter } from "../../util/StringFilter";
-import { PostWhereUniqueInput } from "../../post/base/PostWhereUniqueInput";
+import { UserWhereUniqueInput } from "../../user/base/UserWhereUniqueInput";
 
 @InputType()
-class UserWhereInput {
+class PostWhereInput {
   @ApiProperty({
     required: false,
     type: StringNullableFilter,
@@ -28,7 +28,7 @@ class UserWhereInput {
   @Field(() => StringNullableFilter, {
     nullable: true,
   })
-  firstName?: StringNullableFilter;
+  description?: StringNullableFilter;
 
   @ApiProperty({
     required: false,
@@ -43,29 +43,6 @@ class UserWhereInput {
 
   @ApiProperty({
     required: false,
-    type: StringNullableFilter,
-  })
-  @Type(() => StringNullableFilter)
-  @IsOptional()
-  @Field(() => StringNullableFilter, {
-    nullable: true,
-  })
-  lastName?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => PostWhereUniqueInput,
-  })
-  @ValidateNested()
-  @Type(() => PostWhereUniqueInput)
-  @IsOptional()
-  @Field(() => PostWhereUniqueInput, {
-    nullable: true,
-  })
-  posts?: PostWhereUniqueInput;
-
-  @ApiProperty({
-    required: false,
     type: StringFilter,
   })
   @Type(() => StringFilter)
@@ -73,7 +50,19 @@ class UserWhereInput {
   @Field(() => StringFilter, {
     nullable: true,
   })
-  username?: StringFilter;
+  title?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UserWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UserWhereUniqueInput, {
+    nullable: true,
+  })
+  userId?: UserWhereUniqueInput;
 }
 
-export { UserWhereInput as UserWhereInput };
+export { PostWhereInput as PostWhereInput };

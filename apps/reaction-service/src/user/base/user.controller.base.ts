@@ -27,6 +27,7 @@ import { UserWhereUniqueInput } from "./UserWhereUniqueInput";
 import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserUpdateInput } from "./UserUpdateInput";
 import { User } from "./User";
+import { Post } from "../../post/base/Post";
 
 @swagger.ApiBearerAuth()
 @common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
@@ -48,12 +49,27 @@ export class UserControllerBase {
   })
   async create(@common.Body() data: UserCreateInput): Promise<User> {
     return await this.service.create({
-      data: data,
+      data: {
+        ...data,
+
+        posts: data.posts
+          ? {
+              connect: data.posts,
+            }
+          : undefined,
+      },
       select: {
         createdAt: true,
         firstName: true,
         id: true,
         lastName: true,
+
+        posts: {
+          select: {
+            id: true,
+          },
+        },
+
         roles: true,
         updatedAt: true,
         username: true,
@@ -82,6 +98,13 @@ export class UserControllerBase {
         firstName: true,
         id: true,
         lastName: true,
+
+        posts: {
+          select: {
+            id: true,
+          },
+        },
+
         roles: true,
         updatedAt: true,
         username: true,
@@ -111,6 +134,13 @@ export class UserControllerBase {
         firstName: true,
         id: true,
         lastName: true,
+
+        posts: {
+          select: {
+            id: true,
+          },
+        },
+
         roles: true,
         updatedAt: true,
         username: true,
@@ -143,12 +173,27 @@ export class UserControllerBase {
     try {
       return await this.service.update({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          posts: data.posts
+            ? {
+                connect: data.posts,
+              }
+            : undefined,
+        },
         select: {
           createdAt: true,
           firstName: true,
           id: true,
           lastName: true,
+
+          posts: {
+            select: {
+              id: true,
+            },
+          },
+
           roles: true,
           updatedAt: true,
           username: true,
@@ -186,6 +231,13 @@ export class UserControllerBase {
           firstName: true,
           id: true,
           lastName: true,
+
+          posts: {
+            select: {
+              id: true,
+            },
+          },
+
           roles: true,
           updatedAt: true,
           username: true,

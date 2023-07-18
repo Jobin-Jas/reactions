@@ -12,14 +12,11 @@ https://docs.amplication.com/how-to/custom-code
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsOptional, ValidateNested } from "class-validator";
-import { PostWhereUniqueInput } from "../../post/base/PostWhereUniqueInput";
+import { UserWhereUniqueInput } from "../../user/base/UserWhereUniqueInput";
 import { Type } from "class-transformer";
-import { IsJSONValue } from "@app/custom-validators";
-import { GraphQLJSON } from "graphql-type-json";
-import { InputJsonValue } from "../../types";
 
 @InputType()
-class UserCreateInput {
+class PostUpdateInput {
   @ApiProperty({
     required: false,
     type: String,
@@ -29,7 +26,7 @@ class UserCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  firstName?: string | null;
+  description?: string | null;
 
   @ApiProperty({
     required: false,
@@ -40,42 +37,19 @@ class UserCreateInput {
   @Field(() => String, {
     nullable: true,
   })
-  lastName?: string | null;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  password!: string;
+  title?: string;
 
   @ApiProperty({
     required: false,
-    type: () => PostWhereUniqueInput,
+    type: () => UserWhereUniqueInput,
   })
   @ValidateNested()
-  @Type(() => PostWhereUniqueInput)
+  @Type(() => UserWhereUniqueInput)
   @IsOptional()
-  @Field(() => PostWhereUniqueInput, {
+  @Field(() => UserWhereUniqueInput, {
     nullable: true,
   })
-  posts?: PostWhereUniqueInput | null;
-
-  @ApiProperty({
-    required: true,
-  })
-  @IsJSONValue()
-  @Field(() => GraphQLJSON)
-  roles!: InputJsonValue;
-
-  @ApiProperty({
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @Field(() => String)
-  username!: string;
+  userId?: UserWhereUniqueInput;
 }
 
-export { UserCreateInput as UserCreateInput };
+export { PostUpdateInput as PostUpdateInput };
